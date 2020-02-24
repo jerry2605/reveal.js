@@ -91,6 +91,7 @@ installed on a Linux VM in your environment.
 [download link](https://mysupport.netapp.com/products/p/netap_databroker.html)  
 https://mysupport.netapp.com/products/p/netap_databroker.html
 
+
 # Deploying the NetApp Data Broker
 Enter vCenter username/password, NDB username/password and NDB hostname
 > Notice: if use static IP, don't forget to config, it is not **mandatory**
