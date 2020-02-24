@@ -1,0 +1,149 @@
+# NetApp Data Broker Deployment
+> ### Deployment Guide for SnapCenter Plug-in for VMware vSphere
+
+
+
+# SnapCenter License
+
+SnapCenter Plug-in for VMware vSphere is a **free** product if you are using the following
+storage systems:
+
+* FAS
+* AFF
+* Cloud Volumes ONTAP
+* ONTAP Select
+
+> **Best Practice**: It is recommended, but not required, that you add SnapCenter Standard
+licenses to secondary destinations. If SnapCenter Standard licenses are not enabled on
+secondary systems, you cannot use SnapCenter after performing a failover operation.
+However, FlexClone license on secondary is required to perform clone and verification
+operations.
+
+
+
+# Host Requirements
+* Deploy the NetApp Data Broker virtual appliance as a Linux VM
+* NDB should in the same timezone as the vCenter
+* Must not deploy the virtual appliance in a folder that has a name with special characters. The folder name should not contain the following special characters: $!@#%^&()_+{}';.,*?"<>|
+* Must deploy and register a separate, unique instance of the virtual appliance for each vCenter Server.
+* The SnapCenter Plug-in for VMware vSphere provides limited support of shared PCI or PCIe devices (for example, NVIDIA Grid GPU) due to a limitation of the virtual machines in supporting Storage vMotion.
+
+
+
+# Software support
+| Item                                  | Support versions     |
+| ------------------------------------- | -------------------------------------------------------- |
+| SnapCenter Plug-in for VMware vCenter | NetApp Data Broker 1.0 or later SnapCenter 4.2 or later      |
+| vCenter                               | Flex client: 6.0U3, 6.5U2/U3, 6.7, 6.7U1, 6.7U2, 6.7U3 <br>HTML5 client: 6.5U2d/U3, 6.7, 6.7U1, 6.7U2, 6.7U3 |
+| ESXi                                  | 5.5, 6.0 or later   |
+| IP addresses                          | IPv4,Pv6   |
+| Java                                  | 8  |
+| .Net Core                             | 2.1           |
+| NetApp Data Broker repository         | MySQL 8.0.16           |
+| VMware TLS                            | 1.2  |
+| TLS on the SnapCenter Server          | TLSv1.1 and later<br> The SnapCenter Server uses this to communicate with<br>the virtual appliance for application over VMDK data<br>protection operations.  |
+
+
+# Space and Sizing Requirements
+| Item                    | Requirements                       |
+| ----------------------- | ---------------------------------- |
+| Operating system        | Linux                              |
+| Minimum CPU communicate | 4 cores                            |
+| Minimum RAM             | Minimum: 12GB<br>Recommended: 16GB |
+| Minimum hard drive space for the SnapCenter Plog-in <br> for VMware vSphere, logs and repository                |      100GB                          |
+
+
+# Connection and port requirements
+| Type of port                               | Preconfigured port    |
+| ------------------------------------------ | ----------------------|
+| SnapCenter Plug-in for VMware vSphere port | 8144 (HTTPS), bidirectional<br>The port is used for communications from the vCenter<br>vSphere web client and from the SnapCenter Server.<br>8080 bidirectional<br>This port is used to manage the virtual appliance. <br> *note: You cannot modify the port configuration.*|
+| VMware vSphere vCenter Server port         | 443 (HTTPS), bidirectional<br>The port is used for communication between the<br>storage VM host for the SnapCenter Plug-in for<br>VMware vSphere and vCenter.   |
+
+
+# Configurations supported
+Each plug-in instance supports only one vCenter Server. vCenters in linked mode are
+supported. Multiple plug-in instances can support the same SnapCenter Server.
+
+![Linked Mode](images/linked_mode.png)
+
+
+# RBAC privileges required
+The vCenter administrator account must have the required vCenter privileges
+
+| To do this operation... | You must have these vCenter privileges... |
+| ----------------------- | ----------------------------------------- |
+| Deploy and register the SnapCenter Plug-in for<br>VMware vSphere in vCenter |  Extension: Register extension   |
+| Upgrade or remove the SnapCenter Plug-in for<br>VMware vSphere  |    Extension<br> • Update extension<br> * Unregister extension   |
+|  Allow the vCenter Credential user account registered<br>in SnapCenter to validate user access to the<br>SnapCenter Plug-in for VMware vSphere | sessions.validate.session |
+| Allow users to access the SnapCenter Plug-in for<br>VMware vSphere                        | SCV Administrator<br>SCV Backup<br>SCV Guest File Restore<br>SCV Restore<br>SCV View<br>The privilege must be assigned at the vCenter root.|
+
+
+
+# Downloading the NetApp Data Broker OVA (Open Virtual Appliance)
+You can download the **.ova** file for the NetApp Data Broker from the NetApp Support Site.
+The **.ova** file includes a set of microservices for VM and datastore data protection, which are
+performed by the SnapCenter Plug-in for VMware vSphere, and the NetApp Data Broker,
+which facilitates the virtual appliance. When the deployment is complete, all components are
+installed on a Linux VM in your environment.
+
+> version 1.01 size: 3.45 GB
+
+[download link](https://mysupport.netapp.com/products/p/netap_databroker.html)  
+https://mysupport.netapp.com/products/p/netap_databroker.html
+
+# Deploying the NetApp Data Broker
+Enter vCenter username/password, NDB username/password and NDB hostname
+> Notice: if use static IP, don't forget to config, it is not **mandatory**
+
+![Deploy OVF Template](images/Deploy_OVF_Template.png)
+
+
+# Install VMware Tools
+While the virtual appliance is powering on --> click install VMware Tools
+
+The plugin will be registered during VMware tool installation.
+
+![install VMware Tool](images/installVMwareTool.png)
+
+
+# Log in NDB Dashboard
+
+> vCenter is connected
+
+https://\<OVA-IP-address>:8080
+
+![NDB Dashboard](images/NDB_Dashboard.png)
+
+
+# Log in NDB Maintenance Console
+By default, the maintenance console username is set to “**maint**” and the password is set
+to “**admin123**”.
+
+![NDB Maint Console](images/NDB_MaintConsole.png)
+
+
+# NDB in vCenter
+![NDB in vCenter](images/NDB_in_vCenter.png)
+
+
+# Registering the SnapCenter Plug-in for VMware vSphere with SnapCenter Server
+If you want to perform application-over-VMDK workflows in SnapCenter (application-based
+protection workflows for virtualized databases and file systems), you must register the
+SnapCenter Plug-in for VMware vSphere virtual appliance with the SnapCenter Server.
+
+![add host in SnapCenter](images/addHost.png)
+
+| For this field... | Do this... |
+| ----------------- | ---------- |
+| Host Type         |  Select “vSphere” as the type of host. |
+| Host name         | Verify the IP address of the NetApp Data Broker virtual appliance.|
+| Credential        |  Enter the username and password for the NetApp Data Broker virtual appliance that was provided during the appliance deployment. |
+
+
+
+# When to use the SnapCenter GUI and the SnapCenter vSphere web client
+
+| Use this GUI... | To perform these operations ... | And to access these backups |
+| --------------- | ------------------------------- | --------------------------- |
+| SnapCenter vSphere web<br>client GUI |VM and datastore backup<br>VMDK attach and detach<br>Datastore mount and unmount<br>VM restore<br>VMDK restore<br>Guest file and folder restore| Backups of VMs and datastores<br>Vthat were performed by using the<br>VSnapCenter vSphere web client<br>VGUI. |
+| SnapCenter GUI | Backup and restore of virtualized<br>databases and applications, including<br>protecting Microsoft SQL Server<br>databases, Microsoft Exchange<br>databases, SAP HANA databases, and<br>Oracle databases.<br>Database clone | Backups performed by using<br>the SnapCenter GUI. |
